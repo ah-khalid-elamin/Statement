@@ -2,16 +2,21 @@ package com.nagarro.assessments.statement.domains;
 
 import java.util.Date;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Convert;
+import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-//import com.nagaro.engine.model.converters.AmountConverter;
-//import com.nagaro.engine.model.converters.DateConverter;
+import com.nagarro.assessments.statement.domains.converters.AmountConverter;
+import com.nagarro.assessments.statement.domains.converters.DateConverter;
+
 
 @Entity
 @Table(name = "statement")
-public class Statement {
+public class Statement implements Comparable<Statement> {
 
     @Id
     // @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -22,12 +27,12 @@ public class Statement {
     @JoinColumn(name="account_id")
     private Account accountId;
 
-    //@Convert(converter = DateConverter.class)
+    @Convert(converter = DateConverter.class)
     @Column(name="datefield")
     private Date datefield;
 
     @Column(name="amount")
-    //@Convert(converter = AmountConverter.class)
+    @Convert(converter = AmountConverter.class)
     private Double amount;
 
     public Long getId() {
@@ -67,6 +72,11 @@ public class Statement {
         return "Statement [accountId=" + accountId.getAccountNumber() + ", amount=" + amount + ", datefield=" + datefield + ", id=" + id
                 + "]";
     }
+
+	@Override
+	public int compareTo(Statement object) {
+		return this.id.compareTo(object.id);
+	}
 
 
 }

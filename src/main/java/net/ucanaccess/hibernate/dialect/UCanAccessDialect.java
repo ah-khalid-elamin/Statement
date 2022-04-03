@@ -50,7 +50,15 @@ public class UCanAccessDialect extends SQLServerDialect {
         registerFunction("minute", new SQLFunctionTemplate(StandardBasicTypes.INTEGER, "Minute(?1)"));
         registerFunction("hour", new SQLFunctionTemplate(StandardBasicTypes.INTEGER, "Hour(?1)"));
     }
-
+    @Override
+    public char openQuote() {
+        return '[';
+    }
+    
+    @Override
+    public char closeQuote() {
+        return ']';
+    }
     // -----------------------
     // IDENTITY column support
     // -----------------------

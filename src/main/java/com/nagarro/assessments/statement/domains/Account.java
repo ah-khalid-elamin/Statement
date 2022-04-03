@@ -3,6 +3,7 @@ package com.nagarro.assessments.statement.domains;
 import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -10,7 +11,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-//import com.nagaro.engine.model.converters.AccountConverter;
+import com.nagarro.assessments.statement.domains.converters.AccountConverter;
+
 
 @Entity
 @Table(name = "account")
@@ -23,12 +25,12 @@ public class Account {
     @Column(name="account_type")
     private String accountType;
 
-    //@Convert(converter = AccountConverter.class)
+    @Convert(converter = AccountConverter.class)
     @Column(name="account_number")
     private String accountNumber;
 
-    @OneToMany //(mappedBy = "ID")
-    private List<Statement> statements;
+    // @OneToMany //(mappedBy = "ID")
+    // private List<Statement> statements;
 
     public Long getId() {
         return id;
@@ -54,11 +56,11 @@ public class Account {
         this.accountNumber = accountNumber;
     }
 
-    public List<Statement> getStatements() {
-        return statements;
-    }
+    // public List<Statement> getStatements() {
+    //     return statements;
+    // }
 
-    public void setStatements(List<Statement> statements) {
-        this.statements = statements;
-    }
+    // public void setStatements(List<Statement> statements) {
+    //     this.statements = statements;
+    // }
 }
