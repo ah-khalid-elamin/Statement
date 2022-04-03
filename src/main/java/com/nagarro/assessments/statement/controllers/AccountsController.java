@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/accounts")
 public class AccountsController {
-    @Autowired
+	@Autowired
 	private AccountStatementImpl accountStatmentService;
-
 
 	@GetMapping()
 	public List<Account> GetAccounts() {

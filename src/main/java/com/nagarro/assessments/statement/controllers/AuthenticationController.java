@@ -4,49 +4,49 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.nagarro.assessments.statement.config.WebSecurityConfig;
 import com.nagarro.assessments.statement.domains.LoginModel;
-import com.nagarro.assessments.statement.domains.util.JwtTokenUtil;
-import com.nagarro.assessments.statement.exceptions.InvalidUserException;
+import com.nagarro.assessments.statement.security.JwtHelper;
+import com.nagarro.assessments.statement.security.WebSecurityConfig;
 
+@CrossOrigin(origins = { "${app.security.cors.origin}" })
 @RestController
 public class AuthenticationController {
-	
-	@Autowired
-	UserDetailsService UserDetailsService;
-	@Autowired
-	PasswordEncoder PasswordEncoder;
-	@Autowired
-	JwtTokenUtil jwtTokenUtil;
-	
-	@PostMapping(path = "login")
-	public String login(@RequestBody LoginModel loginModel) throws InvalidUserException {
 
+	private final JwtHelper jwtHelper;
+	private final UserDetailsService userDetailsService;
+	private final PasswordEncoder passwordEncoder;
+
+	public AuthenticationController(JwtHelper jwtHelper, UserDetailsService userDetailsService,
+			PasswordEncoder passwordEncoder) {
+		this.jwtHelper = jwtHelper;
+		this.userDetailsService = userDetailsService;
+		this.passwordEncoder = passwordEncoder;
+	}
+
+	@PostMapping("login")
+	public String login(@RequestBody LoginModel loginModel) {
 
 		UserDetails userDetails;
-		
-			userDetails = UserDetailsService.loadUserByUsername(loginModel.getUsername());
-		
-			if(userDetails.getUsername().equals(""))
-				throw new InvalidUserException("Invalid User");
-				
-		if (PasswordEncoder.matches(loginModel.getPassword(), userDetails.getPassword())) {
-			Map<String, Object> claims = new HashMap<String, Object>();
+		try {
+			userDetails = userDetailsService.loadUserByUsername(loginModel.getUsername());
+		} catch (UsernameNotFoundException e) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found");
+		}
+
+		if (passwordEncoder.matches(loginModel.getPassword(), userDetails.getPassword())) {
+			Map<String, String> claims = new HashMap<>();
 			claims.put("username", loginModel.getUsername());
 
 			String authorities = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
@@ -54,10 +54,7 @@ public class AuthenticationController {
 			claims.put(WebSecurityConfig.AUTHORITIES_CLAIM_NAME, authorities);
 			claims.put("userId", String.valueOf(1));
 
-			String jwt = jwtTokenUtil.generateToken(claims,userDetails);
-				
-			if(jwtTokenUtil.validateToken(jwt, userDetails))
-				System.out.println("Valid token: " + jwt);;
+			String jwt = jwtHelper.createJwtForClaims(loginModel.getUsername(), claims);
 			return jwt;
 		}
 

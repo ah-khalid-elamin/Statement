@@ -13,10 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-/**
- *
- * 
- */
 @Configuration
 public class DataSourceConfig {
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -26,14 +22,14 @@ public class DataSourceConfig {
 
 	@Bean
 	public DataSource createDataSource() throws PropertyVetoException {
-	logger.info("Connectin to Database");
-	ComboPooledDataSource ds = new ComboPooledDataSource();
+		
+		logger.info("Connectin to Database");
+		ComboPooledDataSource dataSource = new ComboPooledDataSource();
 
-	ds.setJdbcUrl(env.getProperty("jdbc.url"));
-	ds.setDriverClass(env.getProperty("db.driver"));
+		dataSource.setJdbcUrl(env.getProperty("jdbc.url"));
+		dataSource.setDriverClass(env.getProperty("db.driver"));
 
-	return ds;
-
+		return dataSource;
 	}
 
 }

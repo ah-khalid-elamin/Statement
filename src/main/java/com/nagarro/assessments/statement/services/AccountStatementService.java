@@ -7,7 +7,6 @@ import com.nagarro.assessments.statement.domains.Account;
 import com.nagarro.assessments.statement.domains.Statement;
 
 public interface AccountStatementService {
-    public List<Statement> search(Long accountId, Date fromDate, Date toDate, Double lower, Double higher);
     public List<Statement> getStatements();
     public List<Statement> getStatementsByAccountId(Long accountId, Date fromDate, Date toDate, Double lower, Double higher);
     public List<Account> getAccounts();

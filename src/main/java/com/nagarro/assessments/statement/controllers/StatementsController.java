@@ -23,16 +23,26 @@ public class StatementsController {
 	@Autowired
 	private AccountStatementImpl accountStatmentService;
 
-	@GetMapping()
-	@PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
-	public List<Statement> GetStatements(@RequestParam(required = false) Long accountId,
-		@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
-		@RequestParam(required = false)  @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate,
-		@RequestParam(required = false)  Double lower,
-		@RequestParam(required = false)  Double higher) throws InvalidAccountException {
-		
-		if(accountId == null) throw new InvalidAccountException("Invalid Account Id."); 
-		System.out.println(accountId);
+	@GetMapping("admin")
+	@PreAuthorize("hasAuthority('ADMIN')")
+	public List<Statement> GetStatementForAdmin(@RequestParam(required = true) Long accountId,
+			@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date fromDate,
+			@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date toDate,
+			@RequestParam(required = false) Double lower, @RequestParam(required = false) Double higher)
+			throws InvalidAccountException {
+
+		if (accountId == null)
+			throw new InvalidAccountException("Invalid Account Id.");
 		return accountStatmentService.getStatementsByAccountId(accountId, fromDate, toDate, lower, higher);
+	}
+
+	@GetMapping("user")
+	@PreAuthorize("hasAuthority('USER')")
+	public List<Statement> GetStatementForUser(@RequestParam(required = true) Long accountId)
+			throws InvalidAccountException {
+
+		if (accountId == null)
+			throw new InvalidAccountException("Invalid Account Id.");
+		return accountStatmentService.getStatementsByAccountId(accountId, null, null, null, null);
 	}
 }
